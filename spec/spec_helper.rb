@@ -1,0 +1,5 @@
+require 'rspec'
+require 'awesome_print'
+require 'pry-byebug'
+require 'webmock/rspec'
+require_relative './../lib/getter.rb'

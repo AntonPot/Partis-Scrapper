@@ -6,7 +6,7 @@ class Runner
 
     loop do
       r.fetch_document
-      r.scrap_last_file_data
+      r.scrap_document
       r.download_file if r.new_file?
 
       sleep 5
@@ -15,7 +15,6 @@ class Runner
   end
 
   attr_reader :getter, :file_data, :document
-  attr_writer :last_upload_time
 
   def initialize
     @getter = Getter.new
@@ -39,12 +38,12 @@ class Runner
     @document = getter.response.body
   end
 
-  def scrap_last_file_data
-    service = Scrapper.scrap(@document)
+  def scrap_document
+    scrapper = Scrapper.scrap(@document)
     @file_data = {
-      id: service.file_id,
-      name: service.file_name,
-      time: service.upload_time
+      id: scrapper.file_id,
+      name: scrapper.file_name,
+      time: scrapper.upload_time
     }
   end
 

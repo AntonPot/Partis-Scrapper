@@ -10,8 +10,8 @@ class Getter
     'user[password]' => ENV['PASSWORD']
   }.freeze
   FILE = {
-    path: '/Users/Ptx/Downloads',
-    type: 'torrent'
+    path: ENV['DOWNLOAD_PATH'],
+    type: ENV['FILE_TYPE']
   }.freeze
 
   attr_reader :uri, :cookie, :response, :code

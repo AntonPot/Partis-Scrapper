@@ -9,7 +9,7 @@ class Runner
       r.scrap_document
       r.download_file if r.new_file?
 
-      sleep 5
+      sleep 10
       print '.'
     end
   end

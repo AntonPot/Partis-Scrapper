@@ -17,7 +17,7 @@ class Scrapper
 
   def find_matching_node
     document.search('div.listeklink')[0..10].each do |node|
-      next unless node.elements.first.content.match?(/mavericks|Mavericks/)
+      next unless node.elements.first.content.match?(/Heat|Lakers|Bucks|Mavericks/)
 
       @link_node, @time_node = node.elements
       break

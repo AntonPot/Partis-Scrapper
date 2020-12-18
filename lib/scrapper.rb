@@ -1,4 +1,4 @@
-require 'Nokogiri'
+require 'nokogiri'
 
 class Scrapper
   attr_reader :document, :upload_time, :file_id, :file_name, :link_node, :time_node

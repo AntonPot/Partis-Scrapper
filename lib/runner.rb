@@ -3,6 +3,7 @@ require_relative './scrapper.rb'
 class Runner
   def self.run
     r = new
+    r.last_upload_time = Time.new(2020)
 
     loop do
       r.fetch_document
@@ -15,6 +16,7 @@ class Runner
   end
 
   attr_reader :getter, :file_data, :document
+  attr_writer :last_upload_time
 
   def initialize
     @getter = Getter.new

@@ -9,6 +9,7 @@ class Getter
     'user[username]' => ENV['LOGIN_NAME'],
     'user[password]' => ENV['PASSWORD']
   }.freeze
+
   FILE = {
     path: ENV['DOWNLOAD_PATH'],
     type: ENV['FILE_TYPE']

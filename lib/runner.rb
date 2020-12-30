@@ -1,22 +1,38 @@
 require_relative './getter.rb'
 require_relative './scrapper.rb'
+
 class Runner
   def self.run
     r = new
 
     loop do
       r.fetch_document
-      r.scrap_document
-      r.download_file if r.new_file?
+      r.find_entries
+      r.filter_new_entries
 
-      sleep 10
+      r.download_new_entries if r.new_entries?
+
+      wait 10
       print '.'
     end
   end
 
-  attr_reader :getter, :file_data, :document
+  def self.wait(seconds)
+    sleep(seconds) unless ENV['test'] == '1'
+  end
+
+  def self.log_filename
+    'log/file_ids'
+  end
+
+  def self.search_regex
+    /Mavericks/
+  end
+
+  attr_reader :getter, :document, :ids_log, :entries, :file
 
   def initialize
+    File.new(log_filename, 'a+').close
     @getter = Getter.new
   end
 
@@ -26,37 +42,47 @@ class Runner
 
     until getter.code == '200' || i >= 300
       i += 1
-      puts "\nAuth unsuccessful. Sign in attempt --> #{i}"
-      sleep 2
+      puts "\nSign in attempt --> #{i}"
+      Runner.wait 2
       getter.fetch_sign_in_page
-      sleep 2
+      Runner.wait 2
       getter.post_sign_in
-      sleep 2
+      Runner.wait 2
       getter.fetch_desired_page
     end
 
     @document = getter.response.body
   end
 
-  def scrap_document
-    scrapper = Scrapper.scrap(@document)
-    @file_data = {
-      id: scrapper.file_id,
-      name: scrapper.file_name,
-      time: scrapper.upload_time
-    }
+  def find_entries
+    @entries = Scrapper.search(document, search_regex)
   end
 
-  def new_file?
-    @last_upload_time = @file_data[:time] if last_upload_time < @file_data[:time]
+  def filter_new_entries
+    File.foreach(log_filename) do |id|
+      @entries.delete_if { |f| f[:id] == id.chomp }
+    end
   end
 
-  def last_upload_time
-    @last_upload_time ||= @file_data[:time]
+  def new_entries?
+    entries.any?
   end
 
-  def download_file
-    getter.download_file(@file_data)
-    puts "\nNew download: #{file_data[:name]} - Upload time: #{file_data[:time]}"
+  def download_new_entries
+    entries.each do |e|
+      getter.download_file(e)
+      File.open(log_filename, 'a') { |f| f.puts e[:id] }
+      puts "\nNew download: #{e[:name]}"
+    end
+  end
+
+  private
+
+  def log_filename
+    self.class.log_filename
+  end
+
+  def search_regex
+    self.class.search_regex
   end
 end

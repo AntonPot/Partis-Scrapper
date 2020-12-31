@@ -44,7 +44,7 @@ RSpec.describe Runner do
     end
 
     it 'sleeps for 2 seconds between calls' do
-      expect(Runner).to have_received(:wait).with(2).exactly(3).times
+      expect(Runner).to have_received(:wait).with(1).exactly(3).times
     end
 
     it 'sends #fetch_sign_in_page to Getter' do

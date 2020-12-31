@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+gem 'activesupport'
+gem 'awesome_print'
+gem 'dotenv'
+gem 'nokogiri'
+gem 'pry-byebug'
+gem 'rspec'
+gem 'webmock'

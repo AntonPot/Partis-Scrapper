@@ -17,10 +17,47 @@ RSpec.describe Runner do
     allow(Scrapper).to receive(:search).with(nil, Runner.search_regex).and_return(entries)
   end
 
-  pending 'test for all class methods'
-
   describe '#fetch_document' do
-    pending
+    before do
+      allow(subject.getter).to receive(:fetch_desired_page)
+      allow(subject.getter).to receive(:response).and_return(double(body: ''))
+      allow(subject.getter).to receive(:code).and_return('200')
+    end
+
+    it 'sends #fetch_desired_page to Getter' do
+      subject.fetch_document
+      expect(subject.getter).to have_received(:fetch_desired_page).once
+    end
+
+    it 'assigns value to @document' do
+      expect { subject.fetch_document }.to change(subject, :document).from(nil).to('')
+    end
+  end
+
+  describe '#authenticate' do
+    before do
+      allow(subject.getter).to receive(:fetch_sign_in_page)
+      allow(subject.getter).to receive(:post_sign_in)
+      allow(subject.getter).to receive(:fetch_desired_page)
+      allow(Runner).to receive(:wait)
+      subject.authenticate
+    end
+
+    it 'sleeps for 2 seconds between calls' do
+      expect(Runner).to have_received(:wait).with(2).exactly(3).times
+    end
+
+    it 'sends #fetch_sign_in_page to Getter' do
+      expect(subject.getter).to have_received(:fetch_sign_in_page).once
+    end
+
+    it 'sends #post_sign_in to Getter' do
+      expect(subject.getter).to have_received(:post_sign_in).once
+    end
+
+    it 'sends #fetch_desired_page to Getter' do
+      expect(subject.getter).to have_received(:fetch_desired_page).once
+    end
   end
 
   describe '#find_entries' do
@@ -46,18 +83,19 @@ RSpec.describe Runner do
     end
   end
 
-  describe 'new_entries?' do
+  describe '#new_entries?' do
     it 'returns FALSE if @entries is empty' do
       allow(subject).to receive(:entries).and_return([])
       expect(subject.new_entries?).to be false
     end
   end
 
-  describe 'download_new_entries' do
+  describe '#download_new_entries' do
     before do
       allow(subject).to receive(:entries).and_return(new_entries)
       allow(subject.getter).to receive(:download_file).with(new_entries.first)
       allow(File).to receive(:open).with(log_path, 'a')
+      allow($stdout).to receive(:puts)
       subject.download_new_entries
     end
 
@@ -67,6 +105,10 @@ RSpec.describe Runner do
 
     it 'sends .open to File' do
       expect(File).to have_received(:open).with(log_path, 'a')
+    end
+
+    it 'writes to output' do
+      expect($stdout).to have_received(:puts).with("\nNew download: #{new_entries.first[:name]}").once
     end
   end
 end

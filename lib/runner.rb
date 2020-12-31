@@ -26,7 +26,7 @@ class Runner
   end
 
   def self.search_regex
-    /Mavericks/
+    /(NBA 2020)*(Lakers|Nets)/
   end
 
   attr_reader :getter, :document, :ids_log, :entries, :file
@@ -43,15 +43,17 @@ class Runner
     until getter.code == '200' || i >= 300
       i += 1
       puts "\nSign in attempt --> #{i}"
-      Runner.wait 2
-      getter.fetch_sign_in_page
-      Runner.wait 2
-      getter.post_sign_in
-      Runner.wait 2
-      getter.fetch_desired_page
+      authenticate
     end
 
     @document = getter.response.body
+  end
+
+  def authenticate
+    %w[fetch_sign_in_page post_sign_in fetch_desired_page].each do |method|
+      Runner.wait 1
+      getter.send(method)
+    end
   end
 
   def find_entries

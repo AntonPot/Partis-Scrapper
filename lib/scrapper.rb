@@ -1,5 +1,4 @@
 require 'nokogiri'
-require 'pry-byebug'
 
 class Scrapper
   attr_reader :document, :regex

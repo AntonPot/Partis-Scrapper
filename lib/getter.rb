@@ -24,6 +24,8 @@ class Getter
   def fetch_sign_in_page
     uri.path = '/prijava'
     send_request(:get)
+    return unless response
+
     @cookie = response.to_hash['set-cookie'].join('; ')
   end
 
@@ -32,6 +34,8 @@ class Getter
     send_request(:post) do |request|
       request.set_form(CREDENTIALS.to_a, 'multipart/form-data')
     end
+    return unless response
+
     @cookie = response.to_hash['set-cookie'].join('; ')
   end
 
@@ -43,6 +47,7 @@ class Getter
   def download_file(data)
     uri.path = "/torrent/prenesi/#{data[:id]}"
     send_request(:get)
+    return unless response
 
     File.open("#{FILE[:path]}/#{data[:name]}.#{FILE[:type]}", 'wb') do |f|
       f.write(@response.body)
@@ -57,7 +62,11 @@ class Getter
 
     yield(request) if block_given?
 
-    @response = https.request(request)
-    @code = response.code
+    begin
+      @response = https.request(request)
+      @code = response.code
+    rescue Net::ReadTimeout => e
+      puts e.message
+    end
   end
 end

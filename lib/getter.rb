@@ -6,8 +6,8 @@ require 'dotenv/load'
 
 class Getter
   CREDENTIALS = {
-    'user[username]' => ENV['LOGIN_NAME'],
-    'user[password]' => ENV['PASSWORD']
+    'user[username]' => ENV.fetch('LOGIN_NAME'),
+    'user[password]' => ENV.fetch('PASSWORD')
   }.freeze
 
   FILE = {

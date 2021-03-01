@@ -26,7 +26,7 @@ class Runner
   end
 
   def self.search_regex
-    /(NBA 2020)*(Lakers|Nets)/
+    /(NBA 2020)*(Lakers|Nets|Nuggets)/
   end
 
   attr_reader :getter, :document, :ids_log, :entries, :file
